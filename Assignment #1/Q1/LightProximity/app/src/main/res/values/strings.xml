@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Light Proximity</string>
+    <string name="sensor_error">Not Found!</string>
+    <string name="ambient_light_label">Ambient Light</string>
+    <string name="ambient_light_data">0 lux</string>
+    <string name="prox_label">Proximity</string>
+    <string name="prox_data">0.0</string>
+</resources>

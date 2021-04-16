@@ -1,8 +1,3 @@
-
-/*	This is a default program--
-	Use File->Load Prog to load a different program
-*/
-
 int led=3;
 int knob=0;
 
@@ -14,7 +9,11 @@ void setup()
 void loop()
 {
 	int value;
+	
+	// Read the analog value
 	value = analogRead(knob);
 	value = map(value,1,1024,1,255);
+
+	// Dim the LED corresponding input analog value.
 	analogWrite(led, value);	
 }
