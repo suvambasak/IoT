@@ -1,6 +1,8 @@
 from __future__ import print_function
 import paho.mqtt.publish as publish
 
+print('Fix start')
+
 
 # The ThingSpeak Channel ID.
 # Replace <YOUR-CHANNEL-ID> with your channel ID.
