@@ -35,7 +35,7 @@ while True:
     print(counter)
 
     # build the payload string.
-    payload = "f1=" + str(counter)
+    payload = "f1=" + str(counter)+"f2=" + str(counter)
 
     # attempt to publish this data to the topic.
     try:
