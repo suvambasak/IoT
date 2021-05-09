@@ -1,5 +1,6 @@
 from __future__ import print_function
 import paho.mqtt.publish as publish
+import time
 
 
 # The ThingSpeak Channel ID.
@@ -45,3 +46,5 @@ while True:
 
     except:
         print("There was an error while publishing the data.")
+
+    time.sleep(2)
