@@ -30,15 +30,16 @@ topic = "channels/" + channelID + "/publish/" + writeAPIKey
 
 # ser = serial.Serial('/dev/ttyACM0', 9600, timeout=1)
 # ser.flush()
-
+counter = 100
 while(1):
 
-    line = 'test'
+    line = 'msg'
+    counter += 1
 
     # line = ser.readline().decode('utf-8').rstrip()
     print(line)
     # build the payload string.
-    payload = "field1=" + str(line)
+    payload = "field1=" + str(line)+"&field2="+str(counter)
 
     # attempt to publish this data to the topic.
     try:
