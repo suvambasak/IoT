@@ -1,8 +1,9 @@
 from __future__ import print_function
 import paho.mqtt.publish as publish
-
-print('Fix start')
-
+import psutil
+import string
+import random
+import serial
 
 # The ThingSpeak Channel ID.
 # Replace <YOUR-CHANNEL-ID> with your channel ID.
@@ -12,7 +13,6 @@ channelID = "1385093"
 # Replace <YOUR-CHANNEL-WRITEAPIKEY> with your write API key.
 writeAPIKey = "ZGEK3NL0UVWPK3D6"
 
-
 # The hostname of the ThingSpeak MQTT broker.
 mqttHost = "mqtt.thingspeak.com"
 
@@ -20,22 +20,25 @@ mqttHost = "mqtt.thingspeak.com"
 mqttUsername = "mwa0000022490756"
 
 # Your MQTT API key from Account > My Profile.
-mqttAPIKey = "RGCSPFB3RHEITJW4"
+mqttAPIKey = "8HQRSH6RX3BHT23Z"
 
 tTransport = "websockets"
 tPort = 80
 
-
 # Create the topic string.
 topic = "channels/" + channelID + "/publish/" + writeAPIKey
-counter = 100
 
-while True:
-    counter += 10
-    print(counter)
+# ser = serial.Serial('/dev/ttyACM0', 9600, timeout=1)
+# ser.flush()
 
+while(1):
+
+    line = 'test'
+
+    # line = ser.readline().decode('utf-8').rstrip()
+    print(line)
     # build the payload string.
-    payload = "f1=" + str(counter)+"f2=" + str(counter)
+    payload = "field1=" + str(line)
 
     # attempt to publish this data to the topic.
     try:
