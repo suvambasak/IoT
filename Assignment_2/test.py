@@ -1,6 +1,5 @@
 from __future__ import print_function
 import paho.mqtt.publish as publish
-import time
 
 
 # The ThingSpeak Channel ID.
@@ -27,10 +26,10 @@ tPort = 80
 
 # Create the topic string.
 topic = "channels/" + channelID + "/publish/" + writeAPIKey
-counter = 0
+counter = 100
 
 while True:
-    counter += 1
+    counter += 10
     print(counter)
 
     # build the payload string.
@@ -46,5 +45,3 @@ while True:
 
     except:
         print("There was an error while publishing the data.")
-
-    time.sleep(2)
