@@ -1,0 +1,5 @@
+sudo apt install mosquitto mosquitto-clients
+
+mosquitto_sub -d -u pi -P admin123 -t test
+
+mosquitto_pub -d -u pi -P admin123 -t test -m “Hi”
