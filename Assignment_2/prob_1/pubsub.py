@@ -1,13 +1,66 @@
+from __future__ import print_function
+import paho.mqtt.publish as publish
+
 from tkinter import *
 from tkinter import ttk
 import time
 import threading
 
+import psutil
+import string
+import random
+import serial
+
 
 class Publish:
     def __init__(self):
         self.control = None
-        self.t = None
+        self.publisher_threat = None
+
+        # The ThingSpeak Channel ID.
+        # Replace <YOUR-CHANNEL-ID> with your channel ID.
+        self.CHANNEL_ID = "1385093"
+
+        # The write API key for the channel.
+        # Replace <YOUR-CHANNEL-WRITEAPIKEY> with your write API key.
+        self.WRITE_API_KEY = "ZGEK3NL0UVWPK3D6"
+
+        # The hostname of the ThingSpeak MQTT broker.
+        self.MQTT_HOST = "mqtt.thingspeak.com"
+
+        # You can use any username.
+        self.MQTT_USERNAME = "mwa0000022490756"
+
+        # Your MQTT API key from Account > My Profile.
+        self.MQTT_API_KEY = "8HQRSH6RX3BHT23Z"
+
+        self.T_TRANSPORT = "websockets"
+        self.T_PORT = 80
+
+        # Create the topic string.
+        self.TOPIC = "channels/" + self.CHANNEL_ID + "/publish/" + self.WRITE_API_KEY
+
+    def push_data(self):
+        counter = 100
+        while self.control:
+            line = 'msg'
+            self.control += 1
+            print(line)
+
+            # build the payload string.
+            payload = "field1=" + str(line)+"&field2="+str(counter)
+
+            # attempt to publish this data to the topic.
+            try:
+                publish.single(self.TOPIC, payload, hostname=self.MQTT_HOST, transport=self.T_TRANSPORT, port=self.T_PORT, auth={
+                               'username': self.MQTT_USERNAME, 'password': self.MQTT_API_KEY})
+
+            except (KeyboardInterrupt):
+                print('[STOP] : KeyboardInterrupt')
+                break
+
+            except Exception as e:
+                print(e)
 
     def test(self):
         i = 0
@@ -18,12 +71,13 @@ class Publish:
 
     def start(self):
         self.control = True
-        self.t = threading.Thread(target=self.test)
-        self.t.start()
+        # self.publisher_threat = threading.Thread(target=self.test)
+        self.publisher_threat = threading.Thread(target=self.push_data)
+        self.publisher_threat.start()
 
     def stop(self):
         self.control = False
-        self.t.join()
+        self.publisher_threat.join()
 
 
 class GUI:
