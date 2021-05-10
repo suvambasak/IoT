@@ -1,13 +1,18 @@
 from tkinter import *
 from tkinter import ttk
+from matplotlib import pyplot as plt
 import pymysql
 import threading
 import time
 # import Adafruit_DHT
 
+#Test
+import random
+
 
 class Database:
     def __init__(self):
+        self.entry_count=0
         self.host = 'localhost'
         self.user = 'admin'
         self.password = 'admin'
@@ -37,9 +42,13 @@ class Database:
         SQL = "INSERT INTO `dht` (`id`, `time`, `temperature`, `humidity`) VALUES (NULL, NULL, '%s', '%s')"%(temperature,humidity)
         try:
             self.cursor.execute(SQL)
+            self.entry_count+=1
             print('add_new:',temperature,humidity)
         except Exception as e:
             print('\n[**] Exception :: add_new :: ' + str(e))
+
+    def get_entry_count(self):
+        return self.entry_count
 
 
 class Sensor:
@@ -56,10 +65,6 @@ class Sensor:
         self.db = Database()
 
     def sense(self):
-        # TEST
-        humidity=0
-        temperature=0
-
         while self.control:
             try:
                 time.sleep(1)
@@ -70,11 +75,13 @@ class Sensor:
 
 
                 # TEST
-                humidity+=0.7
-                temperature+=0.7
+                humidity=random.randint(0,50)
+                temperature=random.randint(0,50)
 
                 if humidity is not None and temperature is not None:
                     print('Temp={0:0.1f}*C  Humidity={1:0.1f}%'.format(temperature, humidity))
+
+                    self.db.add_new(temperature,humidity)
                 else:
                     print('Failed to get reading. Try again!')
 
@@ -89,17 +96,13 @@ class Sensor:
     def stop(self):
         self.control=False
         self.sensor_threat.join()
+        return self.db.get_entry_count()
 
-
-
-s = Sensor()
-s.start()
-time.sleep(10)
-s.stop()
 
 class GUI:
     def __init__(self):
-        # self.publisher = Publish()
+        self.flag=True
+        self.sensor = Sensor()
 
         self.root = Tk()
         self.root.title('Problem 2')
@@ -127,20 +130,53 @@ class GUI:
         self.start.grid(row=2, column=0)
         self.stop = Button(self.pub_frame, text='Stop', command=self.stop_pub)
         self.stop.grid(row=3, column=0)
+        self.plot = Button(self.pub_frame, text='Plot',command=self.graph)
+        self.plot.grid(row=4, column=0, pady=10)
 
         self.root.mainloop()
 
+    def graph(self):
+        # db = Database()
+        result = Database().fetch_all()
+
+        # X-axis values
+        time = []
+        # Y-axis values
+        temperature = []
+        humidity = []
+
+        for row in result:
+            time.append(row[1])
+            temperature.append(row[2])
+            humidity.append(row[3])
+
+        # plot
+        plt.plot(time,temperature,label='Temperature Line')
+        plt.plot(time,humidity,label='Humidity Line')
+        plt.xlabel('Time')
+        plt.ylabel('Temperature & Humidity')
+        plt.title('DHT Sensor')
+        plt.legend()
+        # function to show the plot
+        plt.show()
+
+
     def start_pub(self):
-        print('Start pub')
-        # self.publisher.start()
-        self.pub_prog.start(20)
-        self.status_text.set('Started..')
+        if self.flag:
+            self.flag=False
+            print('Start pub')
+            self.sensor.start()
+            self.pub_prog.start(20)
+            self.status_text.set('Started..')
 
     def stop_pub(self):
-        print('Stop pub')
-        # self.publisher.stop()
-        self.pub_prog.stop()
-        self.status_text.set('Stopped..')
+        if not self.flag:
+            print('Stop pub')
+            entry = self.sensor.stop()
+            self.pub_prog.stop()
+            self.status_text.set('Stopped..')
+            time.sleep(1.5)
+            self.status_text.set('Total Entry: '+str(entry))
 
 
-# gui = GUI()
+GUI()
