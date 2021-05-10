@@ -19,11 +19,11 @@ class Publish:
 
         # The ThingSpeak Channel ID.
         # Replace <YOUR-CHANNEL-ID> with your channel ID.
-        self.CHANNEL_ID = "1385093"
+        self.CHANNEL_ID = "1385704"
 
         # The write API key for the channel.
         # Replace <YOUR-CHANNEL-WRITEAPIKEY> with your write API key.
-        self.WRITE_API_KEY = "ZGEK3NL0UVWPK3D6"
+        self.WRITE_API_KEY = "JXMONKXBE6TT13RA"
 
         # The hostname of the ThingSpeak MQTT broker.
         self.MQTT_HOST = "mqtt.thingspeak.com"
