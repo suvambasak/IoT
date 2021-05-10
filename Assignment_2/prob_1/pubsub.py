@@ -6,6 +6,8 @@ from tkinter import ttk
 import time
 import threading
 
+import Adafruit_DHT
+
 import psutil
 import string
 import random
@@ -16,6 +18,11 @@ class Publish:
     def __init__(self):
         self.control = None
         self.publisher_threat = None
+
+        # Set sensor type : Options are DHT11,DHT22 or AM2302
+        self.sensor = Adafruit_DHT.DHT11
+        # Set GPIO sensor is connected to
+        self.gpio = 4
 
         # The ThingSpeak Channel ID.
         # Replace <YOUR-CHANNEL-ID> with your channel ID.
@@ -41,23 +48,26 @@ class Publish:
         self.TOPIC = "channels/" + self.CHANNEL_ID + "/publish/" + self.WRITE_API_KEY
 
     def push_data(self):
-        counter = 100
         while self.control:
-            line = 'msg'
-            counter += 5
-            print(line, counter)
-
-            # build the payload string.
-            payload = "field1=" + str(line)+"&field2="+str(counter)
-
-            # attempt to publish this data to the topic.
             try:
+                # Use read_retry method. This will retry up to 15 times to
+                # get a sensor reading (waiting 2 seconds between each retry).
+                humidity, temperature = Adafruit_DHT.read_retry(
+                    self.sensor, self.gpio)
+
+                if humidity is not None and temperature is not None:
+                    print(
+                        'Temp={0:0.1f}*C  Humidity={1:0.1f}%'.format(temperature, humidity))
+                else:
+                    print('Failed to get reading. Try again!')
+                    continue
+
+                # build the payload string.
+                payload = "field1=" + str(temperature)+"&field2="+str(humidity)
+
+                # attempt to publish this data to the topic.
                 publish.single(self.TOPIC, payload, hostname=self.MQTT_HOST, transport=self.T_TRANSPORT, port=self.T_PORT, auth={
                                'username': self.MQTT_USERNAME, 'password': self.MQTT_API_KEY})
-
-            except (KeyboardInterrupt):
-                print('[STOP] : KeyboardInterrupt')
-                break
 
             except Exception as e:
                 print(e)
