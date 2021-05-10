@@ -1,6 +1,9 @@
 from tkinter import *
 from tkinter import ttk
 import pymysql
+import threading
+import time
+# import Adafruit_DHT
 
 
 class Database:
@@ -38,6 +41,61 @@ class Database:
         except Exception as e:
             print('\n[**] Exception :: add_new :: ' + str(e))
 
+
+class Sensor:
+    def __init__(self):
+        self.control = None
+        self.sensor_threat = None
+
+        # Set sensor type : Options are DHT11,DHT22 or AM2302
+        # self.sensor = Adafruit_DHT.DHT11
+        
+        # Set GPIO sensor is connected to
+        self.gpio = 4
+
+        self.db = Database()
+
+    def sense(self):
+        # TEST
+        humidity=0
+        temperature=0
+
+        while self.control:
+            try:
+                time.sleep(1)
+
+                # Use read_retry method. This will retry up to 15 times to
+                # get a sensor reading (waiting 2 seconds between each retry).
+                # humidity, temperature = Adafruit_DHT.read_retry(self.sensor, self.gpio)
+
+
+                # TEST
+                humidity+=0.7
+                temperature+=0.7
+
+                if humidity is not None and temperature is not None:
+                    print('Temp={0:0.1f}*C  Humidity={1:0.1f}%'.format(temperature, humidity))
+                else:
+                    print('Failed to get reading. Try again!')
+
+            except Exception as e:
+                print ('Sense:',str(e))
+
+    def start(self):
+        self.control=True
+        self.sensor_threat = threading.Thread(target=self.sense)
+        self.sensor_threat.start()
+
+    def stop(self):
+        self.control=False
+        self.sensor_threat.join()
+
+
+
+s = Sensor()
+s.start()
+time.sleep(10)
+s.stop()
 
 class GUI:
     def __init__(self):
@@ -85,4 +143,4 @@ class GUI:
         self.status_text.set('Stopped..')
 
 
-gui = GUI()
+# gui = GUI()
