@@ -19,6 +19,25 @@ class Database:
         self.db.autocommit(True)
         self.cursor = self.db.cursor()
 
+    def fetch_all(self):
+        SQL = "SELECT * FROM `dht`"
+        try:
+            self.cursor.execute(SQL)
+            result = self.cursor.fetchall()
+            print ('fetch_all: ',result)
+            return result
+        except Exception as e:
+            print('\n[**] Database :: fetch_all :: ' + str(e))
+            return None
+
+    def add_new(self, temperature, humidity):
+        SQL = "INSERT INTO `dht` (`id`, `time`, `temperature`, `humidity`) VALUES (NULL, NULL, '%s', '%s')"%(temperature,humidity)
+        try:
+            self.cursor.execute(SQL)
+            print('add_new:',temperature,humidity)
+        except Exception as e:
+            print('\n[**] Exception :: add_new :: ' + str(e))
+
 
 class GUI:
     def __init__(self):
