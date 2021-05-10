@@ -44,8 +44,8 @@ class Publish:
         counter = 100
         while self.control:
             line = 'msg'
-            self.control += 1
-            print(line)
+            counter += 5
+            print(line, counter)
 
             # build the payload string.
             payload = "field1=" + str(line)+"&field2="+str(counter)
