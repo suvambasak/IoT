@@ -69,6 +69,8 @@ class Publish:
                 publish.single(self.TOPIC, payload, hostname=self.MQTT_HOST, transport=self.T_TRANSPORT, port=self.T_PORT, auth={
                                'username': self.MQTT_USERNAME, 'password': self.MQTT_API_KEY})
 
+                time.sleep(5)
+
             except Exception as e:
                 print(e)
 
