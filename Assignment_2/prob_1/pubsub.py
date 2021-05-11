@@ -1,17 +1,17 @@
 from __future__ import print_function
-import paho.mqtt.publish as publish
+# import paho.mqtt.publish as publish
 
 from tkinter import *
 from tkinter import ttk
 import time
 import threading
 
-import Adafruit_DHT
+# import Adafruit_DHT
 
-import psutil
+# import psutil
 import string
 import random
-import serial
+# import serial
 
 
 class Publish:
@@ -20,7 +20,7 @@ class Publish:
         self.publisher_threat = None
 
         # Set sensor type : Options are DHT11,DHT22 or AM2302
-        self.sensor = Adafruit_DHT.DHT11
+        # self.sensor = Adafruit_DHT.DHT11
         # Set GPIO sensor is connected to
         self.gpio = 4
 
@@ -101,20 +101,56 @@ class GUI:
 
         # create frame for start publishing
         self.pub_frame = LabelFrame(
-            self.root, text='MQTT Publish', padx=50, pady=50)
+            self.root, text='ThingSpeak Publish', padx=50, pady=50)
         # frame.pack(padx=10, pady=10)
         self.pub_frame.grid(row=0, column=0, padx=10, pady=10)
 
-        # Status View
+        # create frame for subscribing
+        self.sub_frame = LabelFrame(
+            self.root, text='ThingSpeak Subscribe', padx=50, pady=50)
+        self.sub_frame.grid(row=0, column=1, padx=10, pady=10)
+
+        # Status View publishing
         self.status_text = StringVar()
         self.status_text.set('Current Status')
         self.status_view = Label(self.pub_frame, textvariable=self.status_text)
         self.status_view.grid(row=0, column=0)
 
-        # Progress bar
+        # Status View subscrbe
+        self.date_view = Label(self.sub_frame, text='Date')
+        self.date_view.grid(row=0, column=0)
+        self.time_view = Label(self.sub_frame, text='Time')
+        self.time_view.grid(row=1, column=0)
+        self.temperature_view = Label(self.sub_frame, text='Temperature')
+        self.temperature_view.grid(row=2, column=0)
+        self.humidity_view = Label(self.sub_frame, text='Humidity')
+        self.humidity_view.grid(row=3, column=0)
+
+        self.subscription_status_text = StringVar()
+        self.subscription_status_text.set('Unsubscribed')
+        self.subscription_status = Label(
+            self.sub_frame, textvariable=self.subscription_status_text, anchor=W)
+        self.subscription_status.grid(row=4, column=0)
+
+        # Data view
+        self.date = Entry(self.sub_frame)
+        self.date.grid(row=0, column=1)
+        self.time = Entry(self.sub_frame)
+        self.time.grid(row=1, column=1)
+        self.temperature = Entry(self.sub_frame)
+        self.temperature.grid(row=2, column=1)
+        self.humidity = Entry(self.sub_frame)
+        self.humidity.grid(row=3, column=1)
+
+        # Progress bar publishing
         self.pub_prog = ttk.Progressbar(self.pub_frame, orient=HORIZONTAL,
                                         length=150, mode='indeterminate')
         self.pub_prog.grid(row=1, column=0, pady=20)
+
+        # Progress bar subscribing
+        self.sub_prog = ttk.Progressbar(self.sub_frame, orient=HORIZONTAL,
+                                        length=150, mode='indeterminate')
+        self.sub_prog.grid(row=4, column=1, pady=20, columnspan=2)
 
         # adding button in publishing frame.
         self.start = Button(self.pub_frame, text='Start',
@@ -123,7 +159,21 @@ class GUI:
         self.stop = Button(self.pub_frame, text='Stop', command=self.stop_pub)
         self.stop.grid(row=3, column=0)
 
+        # adding button in subscribe frame.
+        self.sub = Button(self.sub_frame, text='Subscribe',
+                          command=self.start_sub)
+        self.sub.grid(row=5, column=0)
+        self.cancel = Button(self.sub_frame, text='Unsubscribe',
+                             command=self.stop_sub)
+        self.cancel.grid(row=5, column=1)
+
         self.root.mainloop()
+
+    def start_sub(self):
+        pass
+
+    def stop_sub(self):
+        pass
 
     def start_pub(self):
         print('Start pub')
