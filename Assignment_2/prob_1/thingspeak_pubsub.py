@@ -8,16 +8,16 @@ import json
 import time
 import threading
 
-# import Adafruit_DHT
-
-import psutil
-import string
-import random
-import serial
+import Adafruit_DHT
 
 
 class Publish:
+    '''
+    ThingSpeak Cloud publish
+    '''
+
     def __init__(self):
+        # Thread control
         self.control = None
         self.publisher_threat = None
 
@@ -51,6 +51,9 @@ class Publish:
         self.TOPIC = "channels/" + self.CHANNEL_ID + "/publish/" + self.WRITE_API_KEY
 
     def push_data(self):
+        # function to publish data in ThingSpeak Cloud
+        # will be running in thread
+
         while self.control:
             try:
                 # Use read_retry method. This will retry up to 15 times to
@@ -58,6 +61,7 @@ class Publish:
                 humidity, temperature = Adafruit_DHT.read_retry(
                     self.sensor, self.gpio)
 
+                # Validation
                 if humidity is not None and temperature is not None:
                     print(
                         'Temp={0:0.1f}*C  Humidity={1:0.1f}%'.format(temperature, humidity))
@@ -75,38 +79,40 @@ class Publish:
                 time.sleep(5)
 
             except Exception as e:
-                print(e)
-
-    def test(self):
-        i = 0
-        while self.control:
-            print(i)
-            i += 1
-            time.sleep(0.5)
+                print('Exception: push_data ', str(e))
 
     def start(self):
+        # function to start the push data thread
         self.control = True
-        # self.publisher_threat = threading.Thread(target=self.test)
         self.publisher_threat = threading.Thread(target=self.push_data)
         self.publisher_threat.start()
 
     def stop(self):
+        # funtion to stop push data thread
         self.control = False
         self.publisher_threat.join()
 
 
 class Subscribe:
+    '''
+    ThingSpeak Cloud subscribe
+    '''
+
     def __init__(self):
+        # Chennel API (result=1 :: take most current data / last entry)
         self.URL = 'https://api.thingspeak.com/channels/1385704/feeds.json?results=1'
 
         # Test
         # self.URL = 'https://api.thingspeak.com/channels/1385093/feeds.json?results=1'
 
     def fetch_update(self):
+        # function to fetch date from Chennel API
+
         with urlopen(self.URL) as url:
+            # parse JSON
             data = json.loads(url.read().decode())
 
-            # (Date,Time,Temperature,Humidity)
+            # return data in format -> (Date,Time,Temperature,Humidity)
             return (
                 data['feeds'][-1]['created_at'].split('T')[0],
                 data['feeds'][-1]['created_at'].split('T')[1][:-1],
@@ -120,30 +126,32 @@ class Subscribe:
             # print('Time: ', data['feeds'][-1]['created_at'].split('T')[1])
 
 
-# s = Subscribe()
-# d = s.fetch_update()
-# print(d[0])
-
-
 class GUI:
+    '''
+    Graphical User Interface for ThingSpeak Cloud publish and subscribe
+    '''
+
     def __init__(self):
+        # object of Publish class and flag to track thread status (not running True | running False).
         self.publisher = Publish()
+        self.pub_flag = True
+
+        # object of Subscribe class | thread | thread control | and thread status flag.
         self.subscriber = Subscribe()
+        self.sub_flag = True
         self.subscriber_thread = None
         self.control = None
-        self.pub_flag = True
-        self.sub_flag = True
 
+        # gui
         self.root = Tk()
         self.root.title('ThingSpeak - Problem 1')
 
-        # create frame for start publishing
+        # frame for start publishing
         self.pub_frame = LabelFrame(
             self.root, text='Publish', padx=61, pady=61)
-        # frame.pack(padx=10, pady=10)
         self.pub_frame.grid(row=0, column=0, padx=10, pady=10)
 
-        # create frame for subscribing
+        # frame for subscribing
         self.sub_frame = LabelFrame(
             self.root, text='Subscribe', padx=30, pady=30)
         self.sub_frame.grid(row=0, column=1, padx=10, pady=10)
@@ -151,33 +159,38 @@ class GUI:
         # Status View publishing
         self.status_text = StringVar()
         self.status_text.set('Current Status')
+
         self.status_view = Label(self.pub_frame, textvariable=self.status_text)
         self.status_view.grid(row=0, column=0)
 
         # Status View subscrbe
         self.date_view = Label(self.sub_frame, text='Date')
-        self.date_view.grid(row=0, column=0)
         self.time_view = Label(self.sub_frame, text='Time')
-        self.time_view.grid(row=1, column=0)
         self.temperature_view = Label(self.sub_frame, text='Temperature')
-        self.temperature_view.grid(row=2, column=0)
         self.humidity_view = Label(self.sub_frame, text='Humidity')
+
+        self.date_view.grid(row=0, column=0)
+        self.time_view.grid(row=1, column=0)
+        self.temperature_view.grid(row=2, column=0)
         self.humidity_view.grid(row=3, column=0)
 
+        # Status view for subsscribing
         self.subscription_status_text = StringVar()
         self.subscription_status_text.set('Unsubscribed')
+
         self.subscription_status = Label(
             self.sub_frame, textvariable=self.subscription_status_text, anchor=W)
         self.subscription_status.grid(row=4, column=0)
 
         # Data view
         self.date = Entry(self.sub_frame)
-        self.date.grid(row=0, column=1)
         self.time = Entry(self.sub_frame)
-        self.time.grid(row=1, column=1)
         self.temperature = Entry(self.sub_frame)
-        self.temperature.grid(row=2, column=1)
         self.humidity = Entry(self.sub_frame)
+
+        self.date.grid(row=0, column=1)
+        self.time.grid(row=1, column=1)
+        self.temperature.grid(row=2, column=1)
         self.humidity.grid(row=3, column=1)
 
         self.date.insert(0, 'xxxx-xx-xx')
@@ -198,25 +211,29 @@ class GUI:
         # adding button in publishing frame.
         self.start = Button(self.pub_frame, text='Start',
                             command=self.start_pub)
-        self.start.grid(row=2, column=0)
         self.stop = Button(self.pub_frame, text='Stop', command=self.stop_pub)
+        self.start.grid(row=2, column=0)
         self.stop.grid(row=3, column=0)
 
         # adding button in subscribe frame.
         self.sub = Button(self.sub_frame, text='Subscribe',
                           command=self.start_sub)
-        self.sub.grid(row=5, column=0)
         self.cancel = Button(self.sub_frame, text='Unsubscribe',
                              command=self.stop_sub)
+        self.sub.grid(row=5, column=0)
         self.cancel.grid(row=5, column=1)
 
         self.root.mainloop()
 
     def loader(self):
+        # function runs in a different thread and update the data of text view
         while self.control:
+
+            # get current data.
             current_state = self.subscriber.fetch_update()
             print(current_state)
 
+            # update all text view
             self.date.delete(0, END)
             self.date.insert(0, current_state[0])
 
@@ -232,39 +249,59 @@ class GUI:
             time.sleep(3)
 
     def start_sub(self):
+        # on subscribe click event
+        # starts leader thead
         if self.sub_flag:
             self.sub_flag = False
             print('Start sub')
 
+            # start thread
             self.control = True
             self.subscriber_thread = threading.Thread(target=self.loader)
             self.subscriber_thread.start()
 
+            # start progress bar and chnage subscription status
             self.sub_prog.start(10)
             self.subscription_status_text.set('Subscribed')
 
     def stop_sub(self):
+        # on unsubscribe click event
+        # stops the leader thead
         if not self.sub_flag:
             self.sub_flag = True
             print('Stop sub')
 
+            # stop infinite loop
             self.control = False
-            # self.subscriber_thread.join()
 
+            # stop progress bar and chnage subscription status
             self.sub_prog.stop()
             self.subscription_status_text.set('Unsubscribed')
 
     def start_pub(self):
-        print('Start pub')
-        self.publisher.start()
-        self.pub_prog.start(20)
-        self.status_text.set('Started..')
+        # on click event of publish
+        # starts publisher thread
+
+        if self.pub_flag:
+            self.pub_flag = False
+            print('Start pub')
+
+            self.publisher.start()
+            self.pub_prog.start(20)
+            self.status_text.set('Started..')
 
     def stop_pub(self):
-        print('Stop pub')
-        self.publisher.stop()
-        self.pub_prog.stop()
-        self.status_text.set('Stopped..')
+        # on click event of publish
+        # starts publisher thread
+
+        if not self.pub_flag:
+            self.pub_flag = True
+            print('Stop pub')
+
+            self.publisher.stop()
+            self.pub_prog.stop()
+            self.status_text.set('Stopped..')
 
 
+# start GUI
 GUI()

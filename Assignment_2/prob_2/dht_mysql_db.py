@@ -24,6 +24,7 @@ class Database:
         # self.user = 'admin'
         # self.password = 'admin'
         # self.dbname = '20mcmb08'
+
         self.user = 'phpmyadmin'
         self.password = 'scisnks99'
         self.dbname = 'phpmyadmin'
@@ -151,7 +152,7 @@ class GUI:
 
         # create frame for start publishing
         self.pub_frame = LabelFrame(
-            self.root, text='DB Store', padx=50, pady=50)
+            self.root, text='MySQL DB Store', padx=50, pady=50)
         self.pub_frame.grid(row=0, column=0, padx=10, pady=10)
 
         # Status View
@@ -173,7 +174,8 @@ class GUI:
         self.stop = Button(self.pub_frame, text='Stop', command=self.stop_pub)
         self.stop.grid(row=3, column=0)
 
-        self.plot = Button(self.pub_frame, text='Plot', command=self.graph)
+        self.plot = Button(
+            self.pub_frame, text='Plot Graph', command=self.graph)
         self.plot.grid(row=4, column=0, pady=10)
 
         self.root.mainloop()
