@@ -1,7 +1,7 @@
 from urllib.request import urlopen
 import json
 
-URL = 'https://api.thingspeak.com/channels/1385093/feeds.json?results=1'
+URL = 'https://api.thingspeak.com/channels/1385704/feeds.json?results=1'
 
 
 with urlopen(URL) as url:

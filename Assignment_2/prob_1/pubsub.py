@@ -3,6 +3,8 @@ from __future__ import print_function
 
 from tkinter import *
 from tkinter import ttk
+from urllib.request import urlopen
+import json
 import time
 import threading
 
@@ -92,22 +94,57 @@ class Publish:
         self.publisher_threat.join()
 
 
+class Subscribe:
+    def __init__(self):
+        # self.URL = 'https://api.thingspeak.com/channels/1385704/feeds.json?results=1'
+
+        # Test
+        self.URL = 'https://api.thingspeak.com/channels/1385093/feeds.json?results=1'
+
+    def fetch_update(self):
+        with urlopen(self.URL) as url:
+            data = json.loads(url.read().decode())
+
+            # (Date,Time,Temperature,Humidity)
+            return (
+                data['feeds'][-1]['created_at'].split('T')[0],
+                data['feeds'][-1]['created_at'].split('T')[1][:-1],
+                data['feeds'][-1]['field1'],
+                data['feeds'][-1]['field2']
+            )
+            # print(data['feeds'][-1])
+            # print('Temp: ', data['feeds'][-1]['field1'])
+            # print('Hume: ', data['feeds'][-1]['field2'])
+            # print('Date: ', data['feeds'][-1]['created_at'].split('T')[0])
+            # print('Time: ', data['feeds'][-1]['created_at'].split('T')[1])
+
+
+# s = Subscribe()
+# d = s.fetch_update()
+# print(d[0])
+
+
 class GUI:
     def __init__(self):
         self.publisher = Publish()
+        self.subscriber = Subscribe()
+        self.subscriber_thread = None
+        self.control = None
+        self.pub_flag = True
+        self.sub_flag = True
 
         self.root = Tk()
-        self.root.title('Problem 1')
+        self.root.title('ThingSpeak - Problem 1')
 
         # create frame for start publishing
         self.pub_frame = LabelFrame(
-            self.root, text='ThingSpeak Publish', padx=50, pady=50)
+            self.root, text='Publish', padx=61, pady=61)
         # frame.pack(padx=10, pady=10)
         self.pub_frame.grid(row=0, column=0, padx=10, pady=10)
 
         # create frame for subscribing
         self.sub_frame = LabelFrame(
-            self.root, text='ThingSpeak Subscribe', padx=50, pady=50)
+            self.root, text='Subscribe', padx=30, pady=30)
         self.sub_frame.grid(row=0, column=1, padx=10, pady=10)
 
         # Status View publishing
@@ -142,6 +179,11 @@ class GUI:
         self.humidity = Entry(self.sub_frame)
         self.humidity.grid(row=3, column=1)
 
+        self.date.insert(0, 'xxxx-xx-xx')
+        self.time.insert(0, 'xx:xx:xx')
+        self.temperature.insert(0, 'xx.x')
+        self.humidity.insert(0, 'xx.x')
+
         # Progress bar publishing
         self.pub_prog = ttk.Progressbar(self.pub_frame, orient=HORIZONTAL,
                                         length=150, mode='indeterminate')
@@ -169,11 +211,47 @@ class GUI:
 
         self.root.mainloop()
 
+    def loader(self):
+        while self.control:
+            current_state = self.subscriber.fetch_update()
+            print(current_state)
+
+            self.date.delete(0, END)
+            self.date.insert(0, current_state[0])
+
+            self.time.delete(0, END)
+            self.time.insert(0, current_state[1])
+
+            self.temperature.delete(0, END)
+            self.temperature.insert(0, current_state[2])
+
+            self.humidity.delete(0, END)
+            self.humidity.insert(0, current_state[3])
+
+            time.sleep(3)
+
     def start_sub(self):
-        pass
+        if self.sub_flag:
+            self.sub_flag = False
+            print('Start sub')
+
+            self.control = True
+            self.subscriber_thread = threading.Thread(target=self.loader)
+            self.subscriber_thread.start()
+
+            self.sub_prog.start(10)
+            self.subscription_status_text.set('Subscribed')
 
     def stop_sub(self):
-        pass
+        if not self.sub_flag:
+            self.sub_flag = True
+            print('Stop sub')
+
+            self.control = False
+            # self.subscriber_thread.join()
+
+            self.sub_prog.stop()
+            self.subscription_status_text.set('Unsubscribed')
 
     def start_pub(self):
         print('Start pub')
@@ -188,4 +266,4 @@ class GUI:
         self.status_text.set('Stopped..')
 
 
-gui = GUI()
+GUI()

@@ -40,7 +40,7 @@ while(1):
     counter = random.randint(0, 50)
 
     # line = ser.readline().decode('utf-8').rstrip()
-    print(line,counter)
+    print(line, counter)
     # build the payload string.
     payload = "field1=" + str(line)+"&field2="+str(counter)
 
