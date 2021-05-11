@@ -1,5 +1,5 @@
 from __future__ import print_function
-# import paho.mqtt.publish as publish
+import paho.mqtt.publish as publish
 
 from tkinter import *
 from tkinter import ttk
@@ -10,10 +10,10 @@ import threading
 
 # import Adafruit_DHT
 
-# import psutil
+import psutil
 import string
 import random
-# import serial
+import serial
 
 
 class Publish:
@@ -22,7 +22,8 @@ class Publish:
         self.publisher_threat = None
 
         # Set sensor type : Options are DHT11,DHT22 or AM2302
-        # self.sensor = Adafruit_DHT.DHT11
+        self.sensor = Adafruit_DHT.DHT11
+
         # Set GPIO sensor is connected to
         self.gpio = 4
 
@@ -96,10 +97,10 @@ class Publish:
 
 class Subscribe:
     def __init__(self):
-        # self.URL = 'https://api.thingspeak.com/channels/1385704/feeds.json?results=1'
+        self.URL = 'https://api.thingspeak.com/channels/1385704/feeds.json?results=1'
 
         # Test
-        self.URL = 'https://api.thingspeak.com/channels/1385093/feeds.json?results=1'
+        # self.URL = 'https://api.thingspeak.com/channels/1385093/feeds.json?results=1'
 
     def fetch_update(self):
         with urlopen(self.URL) as url:
