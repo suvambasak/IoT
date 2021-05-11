@@ -6,6 +6,7 @@ import random
 import serial
 
 import random
+import time
 
 # The ThingSpeak Channel ID.
 # Replace <YOUR-CHANNEL-ID> with your channel ID.
@@ -39,7 +40,7 @@ while(1):
     counter = random.randint(0, 50)
 
     # line = ser.readline().decode('utf-8').rstrip()
-    print(line)
+    print(line,counter)
     # build the payload string.
     payload = "field1=" + str(line)+"&field2="+str(counter)
 
@@ -47,7 +48,7 @@ while(1):
     try:
         publish.single(topic, payload, hostname=mqttHost, transport=tTransport, port=tPort, auth={
                        'username': mqttUsername, 'password': mqttAPIKey})
-
+        time.sleep(5)
     except (KeyboardInterrupt):
         break
 
