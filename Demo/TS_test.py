@@ -5,6 +5,8 @@ import string
 import random
 import serial
 
+import random
+
 # The ThingSpeak Channel ID.
 # Replace <YOUR-CHANNEL-ID> with your channel ID.
 channelID = "1385093"
@@ -33,8 +35,8 @@ topic = "channels/" + channelID + "/publish/" + writeAPIKey
 counter = 100
 while(1):
 
-    line = 'msg'
-    counter += 1
+    line = random.randint(0, 50)
+    counter = random.randint(0, 50)
 
     # line = ser.readline().decode('utf-8').rstrip()
     print(line)
