@@ -4,10 +4,10 @@ from matplotlib import pyplot as plt
 import pymysql
 import threading
 import time
-# import Adafruit_DHT
+import Adafruit_DHT
 
 # Test
-import random
+# import random
 
 
 class Database:
@@ -21,9 +21,12 @@ class Database:
 
         # Credentials
         self.host = 'localhost'
-        self.user = 'admin'
-        self.password = 'admin'
-        self.dbname = '20mcmb08'
+        # self.user = 'admin'
+        # self.password = 'admin'
+        # self.dbname = '20mcmb08'
+        self.user = 'phpmyadmin'
+        self.password = 'scisnks99'
+        self.dbname = 'phpmyadmin'
 
         # Connect
         try:
@@ -83,7 +86,7 @@ class Sensor:
         self.sensor_threat = None
 
         # Set sensor type : Options are DHT11,DHT22 or AM2302
-        # self.sensor = Adafruit_DHT.DHT11
+        self.sensor = Adafruit_DHT.DHT11
 
         # Set GPIO sensor is connected to
         self.gpio = 4
@@ -99,11 +102,12 @@ class Sensor:
 
                 # Use read_retry method. This will retry up to 15 times to
                 # get a sensor reading (waiting 2 seconds between each retry).
-                # humidity, temperature = Adafruit_DHT.read_retry(self.sensor, self.gpio)
+                humidity, temperature = Adafruit_DHT.read_retry(
+                    self.sensor, self.gpio)
 
                 # TEST
-                humidity = random.randint(0, 50)
-                temperature = random.randint(0, 50)
+                # humidity = random.randint(0, 50)
+                # temperature = random.randint(0, 50)
 
                 if humidity is not None and temperature is not None:
                     print(
