@@ -90,7 +90,6 @@ class Publish:
     def stop(self):
         # funtion to stop push data thread
         self.control = False
-        self.publisher_threat.join()
 
 
 class Subscribe:

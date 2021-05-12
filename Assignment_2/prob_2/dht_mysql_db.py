@@ -21,13 +21,13 @@ class Database:
 
         # Credentials
         self.host = 'localhost'
-        # self.user = 'admin'
-        # self.password = 'admin'
-        # self.dbname = '20mcmb08'
+        self.user = 'admin'
+        self.password = 'admin'
+        self.dbname = '20mcmb08'
 
-        self.user = 'phpmyadmin'
-        self.password = 'scisnks99'
-        self.dbname = 'phpmyadmin'
+        # self.user = 'phpmyadmin'
+        # self.password = 'scisnks99'
+        # self.dbname = 'phpmyadmin'
 
         # Connect
         try:
@@ -131,7 +131,6 @@ class Sensor:
     def stop(self):
         # Function to stop the thread
         self.control = False
-        self.sensor_threat.join()
 
         # return total data entry
         return self.db.get_entry_count()
