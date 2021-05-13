@@ -34,17 +34,17 @@ while True:
     # line = ser.readline().decode('utf-8').rstrip()
     # build the payload string.
     payload = "field1=" + str(counter)+"&field2="+str(counter)
-    print('counter', counter)
+    # print('counter', counter)
 
     # attempt to publish this data to the topic.
     try:
         publish.single(topic, payload, hostname=mqttHost, transport=tTransport, port=tPort, auth={
                        'username': mqttUsername, 'password': mqttAPIKey})
-        time.sleep(5)
+        print('Total data entry: ', counter)
+        time.sleep(15)
     except (KeyboardInterrupt):
         break
 
     except:
         print("There was an error while publishing the data.")
-    finally:
-        print('Total data entry: ', counter)
+        
